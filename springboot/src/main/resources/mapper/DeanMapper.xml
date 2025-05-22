@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.DeanMapper">
+
+    <insert id="insert" parameterType="com.example.entity.Dean" useGeneratedKeys="true">
+        insert into dean(username, password, name, sex, role, avatar)
+        values (#{username}, #{password}, #{name}, #{sex}, #{role}, #{avatar})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Dean">
+        update dean
+        set username = #{username}, password = #{password}, name = #{name}, sex  = #{sex}, role = #{role}, avatar = #{avatar}
+        where id = #{id}
+    </update>
+
+</mapper>

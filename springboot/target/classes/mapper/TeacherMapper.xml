@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.TeacherMapper">
+
+    <insert id="insert" parameterType="com.example.entity.Teacher" useGeneratedKeys="true">
+        insert into teacher (username, password, name, avatar, role, sex, title)
+        values (#{username}, #{password}, #{name}, #{avatar}, #{role}, #{sex}, #{title})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Teacher">
+        update teacher
+        set username = #{username}, password = #{password}, name = #{name}, avatar = #{avatar}, role = #{role}, sex = #{sex}, title = #{title}
+        where id = #{id}
+    </update>
+
+    <!-- 秘书页面新增 -->
+
+    <select id="selectAllTeachers" resultType="com.example.entity.Teacher">
+    SELECT id, name FROM teacher ORDER BY id
+    </select>
+    
+    <select id="selectTeacherById" resultType="com.example.entity.Teacher">
+        SELECT * FROM teacher WHERE id = #{id}
+    </select>
+    
+    
+</mapper>

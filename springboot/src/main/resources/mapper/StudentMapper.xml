@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.StudentMapper">
+
+    <insert id="insert" parameterType="com.example.entity.Student" useGeneratedKeys="true">
+        insert into student (username, password, name, avatar, role, sex, code)
+        values (#{username}, #{password}, #{name}, #{avatar}, #{role}, #{sex}, #{code})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.Student">
+        update student
+        set username = #{username}, password = #{password}, name = #{name}, avatar = #{avatar}, role = #{role}, sex = #{sex}, code = #{code}
+        where id = #{id}
+    </update>
+
+    <!-- 秘书页面新增 -->
+
+    <select id="selectStudentList" resultType="com.example.entity.Student">
+        SELECT 
+            s.id,
+            s.name,
+            s.code,
+            s.teacherId as teacherId,
+            t.name as assignedTeacher
+        FROM student s
+        LEFT JOIN teacher t ON s.teacherId = t.id
+        <where>
+            <if test="studentName != null and studentName != ''">
+                AND s.name LIKE CONCAT('%', #{studentName}, '%')
+            </if>
+            <if test="studentId != null and studentId != ''">
+                AND s.code LIKE CONCAT('%', #{studentId}, '%')
+            </if>
+        </where>
+        ORDER BY s.id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="selectStudentCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM student s
+        <where>
+            <if test="studentName != null and studentName != ''">
+                AND s.name LIKE CONCAT('%', #{studentName}, '%')
+            </if>
+            <if test="studentId != null and studentId != ''">
+                AND s.code LIKE CONCAT('%', #{studentId}, '%')
+            </if>
+        </where>
+    </select>
+
+    <update id="updateStudentTeacher">
+        UPDATE student 
+        SET teacherId = #{teacherId}
+        WHERE id = #{studentId}
+    </update>
+
+
+</mapper>

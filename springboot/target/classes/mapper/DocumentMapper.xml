@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.DocumentMapper">
+
+    <!-- 学生端搜索功能 -->
+    <select id="findByUserIdWithFilters" resultType="com.example.entity.Document">
+    SELECT 
+        d.*,
+        s.name as studentName,
+        t.name as teacherName
+    FROM documents d
+    LEFT JOIN student s ON d.userId = s.id
+    LEFT JOIN teacher t ON s.teacherId = t.id
+    WHERE d.userId = #{userId}
+    <if test="type != null and type != ''">
+        AND d.type = #{type}
+    </if>
+    <if test="status != null and status != ''">
+        AND d.status = #{status}
+    </if>
+    ORDER BY d.uploadTime DESC
+    LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserIdWithFilters" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM documents d
+    LEFT JOIN student s ON d.userId = s.id
+    LEFT JOIN teacher t ON s.teacherId = t.id
+    WHERE d.userId = #{userId}
+    <if test="type != null and type != ''">
+        AND d.type = #{type}
+    </if>
+    <if test="status != null and status != ''">
+        AND d.status = #{status}
+    </if>
+    </select>
+    
+    
+    <!-- 教师审核 -->
+    
+    <select id="selectTeacherAuditList" resultType="com.example.entity.Document">
+        SELECT 
+            d.*,
+            s.name as studentName
+        FROM documents d
+        INNER JOIN student s ON d.userId = s.id
+        WHERE s.teacherId = #{teacherId}
+        <if test="studentName != null and studentName != ''">
+            AND s.name LIKE CONCAT('%', #{studentName}, '%')
+        </if>
+        <if test="documentType != null and documentType != ''">
+            AND d.type = #{documentType}
+        </if>
+        <if test="status != null and status != ''">
+            AND d.status = #{status}
+        </if>
+        ORDER BY d.uploadTime DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <select id="selectTeacherAuditCount" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM documents d
+        INNER JOIN student s ON d.userId = s.id
+        WHERE s.teacherId = #{teacherId}
+        <if test="studentName != null and studentName != ''">
+            AND s.name LIKE CONCAT('%', #{studentName}, '%')
+        </if>
+        <if test="documentType != null and documentType != ''">
+            AND d.type = #{documentType}
+        </if>
+        <if test="status != null and status != ''">
+            AND d.status = #{status}
+        </if>
+    </select>
+    
+    <update id="updateStatus">
+        UPDATE documents 
+        SET status = #{status},
+            teacherOpinion = #{teacherOpinion},
+            updatedAt = NOW()
+        WHERE id = #{id}
+        AND (status = 'TEACHER_PENDING' OR status = 'PENDING')
+    </update>
+
+
+
+    <!-- 院长审核 -->
+
+    <select id="selectDeanAuditList" resultType="com.example.entity.Document">
+    SELECT 
+        d.id,
+        d.name,
+        d.type,
+        d.filePath,
+        d.fileSize,
+        d.fileType,
+        d.status,
+        d.teacherOpinion,
+        d.deanOpinion,
+        d.uploadTime,
+        d.userId,
+        d.createdAt,
+        d.updatedAt,
+        s.name as studentName,
+        t.name as teacherName
+    FROM documents d
+    LEFT JOIN student s ON d.userId = s.id
+    LEFT JOIN teacher t ON s.teacherId = t.id
+    WHERE 1=1
+    <if test="studentName != null and studentName != ''">
+        AND s.name LIKE CONCAT('%', #{studentName}, '%')
+    </if>
+    <if test="documentType != null and documentType != ''">
+        AND d.type = #{documentType}
+    </if>
+    <if test="status != null and status != ''">
+        AND d.status = #{status}
+    </if>
+    ORDER BY d.uploadTime DESC
+    LIMIT #{offset}, #{size}
+    </select>
+
+
+    <select id="selectDeanAuditCount" resultType="java.lang.Integer">
+    SELECT COUNT(*)
+    FROM documents d
+    LEFT JOIN student s ON d.userId = s.id
+    LEFT JOIN teacher t ON s.teacherId = t.id
+    WHERE 1=1
+    <if test="studentName != null and studentName != ''">
+        AND s.name LIKE CONCAT('%', #{studentName}, '%')
+    </if>
+    <if test="documentType != null and documentType != ''">
+        AND d.type = #{documentType}
+    </if>
+    <if test="status != null and status != ''">
+        AND d.status = #{status}
+    </if>
+    </select>
+
+    <update id="updateDeanAudit">
+        UPDATE documents
+        SET status = #{status},
+            deanOpinion = #{deanOpinion},
+            updatedAt = NOW()
+        WHERE id = #{id}
+        AND status = 'DEAN_PENDING'
+    </update>
+
+</mapper>
